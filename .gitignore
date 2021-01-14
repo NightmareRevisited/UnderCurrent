@@ -1,0 +1,4 @@
+task.log
+error.log
+.idea
+*.pyc

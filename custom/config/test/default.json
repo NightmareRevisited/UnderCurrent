@@ -1,0 +1,61 @@
+{
+  "name": "test",
+  "desc": "testtest",
+  "plugins": {
+  },
+  "nodes": [
+    {
+      "desc":"节点1",
+      "id":"node1",
+      "parent":[
+        "node4"
+      ],
+      "plugins": {
+        
+      },
+      "action": {
+
+      }
+    },
+    {
+      "desc":"节点2",
+      "id":"node2",
+      "parent":[
+        "node4"
+      ],
+      "plugins": {
+
+      },
+      "action": {
+
+      }
+    },
+    {
+      "desc":"节点3",
+      "id":"node3",
+      "parent":[
+        "node1",
+        "node2",
+        "node4"
+      ],
+      "plugins": {
+
+      },
+      "action": {
+
+      }
+    },
+    {
+      "desc":"节点4",
+      "id":"node4",
+      "parent":[
+      ],
+      "plugins": {
+
+      },
+      "action": {
+
+      }
+    }
+  ]
+}
