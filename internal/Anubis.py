@@ -35,13 +35,13 @@ class Anubis(AnubisRoot):
         PARAM_KEY = getKey(self.taskName)
         KEY = self.params[PARAM_KEY]
         config = loadConfig(self.taskName, KEY)
+        self.registParam(config['params'])
         self.name = config['name']
         self.desc = config['desc']
         self.plugins = config.get("plugins", [])
         for nodeInfo in config['nodes']:
             self.nodes.append(Node(self.taskName, nodeInfo, self.params))
         self.semaphore = Semaphore(max(0, 1 - len(self.nodes)))
-        self.registParam(config['params'])
 
     def registParam(self, paramDefine):
         '''
