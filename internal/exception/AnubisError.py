@@ -22,7 +22,7 @@ taskName: %s
 nodeId: %s
 nodeDesc: %s
 action: %s
-status: %s
+statusCode: %s
 output: %s,
 occurTime: %s,
         ''' % (taskName, nodeId, nodeDesc, action, status, output, occurTime)

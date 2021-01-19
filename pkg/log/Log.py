@@ -18,10 +18,11 @@ import time
 
 class Log(Singleton):
     def __init__(self):
+        self._stdoutQueue = Queue()
         self._logQueue = Queue()
         self._errorQueue = Queue()
-        self._logHandler = [sys.stdout]
-        self._errorHandler = [sys.stdout]
+        self._logHandler = []
+        self._errorHandler = []
         self._prepare2Exit = False
         self._run()
 
@@ -43,34 +44,45 @@ class Log(Singleton):
         def log():
             while True:
                 logData = self._logQueue.get(block=True)
+                self._stdoutQueue.put(logData)
                 for ioWriter in self._logHandler:
                     ioWriter.write(logData + "\n")
                 if self._prepare2Exit and self._logQueue.qsize() == 0:
                     self._logExitSema.release()
                     break
 
+        self._logThread = Thread(target=log, name="LogThread")
+        self._logThread.setDaemon(True)
+        self._logThread.start()
+
         def error():
             while True:
                 errorData = self._errorQueue.get(block=True)
+                self._stdoutQueue.put(errorData)
                 for ioWriter in self._errorHandler:
                     ioWriter.write(errorData + "\n")
                 if self._prepare2Exit and self._errorQueue.qsize() == 0:
                     self._errorExitSema.release()
                     break
 
-        self._logThread = Thread(target=log, name="LogThread")
-        self._logThread.setDaemon(True)
-        self._logThread.start()
-
         self._errorThread = Thread(target=error, name="ErrorLogThread")
         self._errorThread.setDaemon(True)
         self._errorThread.start()
+
+        def stdout():
+            while True:
+                output = self._stdoutQueue.get(block=True)
+                sys.stdout.write("%s: %s \n" % (time.ctime(), output))
+
+        self._stdoutThread = Thread(target=stdout, name="stdoutThread")
+        self._stdoutThread.setDaemon(True)
+        self._stdoutThread.start()
 
     def exit(self):
         self._prepare2Exit = True
         self._logExitSema = Semaphore(0)
         self._errorExitSema = Semaphore(0)
-        self.log("Exit 0",time.ctime())
-        self.error("Exit 0",time.ctime())
+        self.log("Exit 0", time.ctime())
+        self.error("Exit 0", time.ctime())
         self._logExitSema.acquire()
         self._errorExitSema.acquire()

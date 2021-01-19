@@ -15,6 +15,8 @@ from pkg.log.Log import Log
 from pkg.tools import runCommand
 from internal.exception.ErrorStack import ErrorStack
 import time
+import re
+import internal.consts as Const
 
 
 class Node(AnubisRoot):
@@ -32,13 +34,13 @@ class Node(AnubisRoot):
         self.taskName = taskName
         self.id = nodeInfo['id']
         self.desc = nodeInfo['desc']
-        self.param = param
         self.parent = nodeInfo.get("parent", [])
         self.selfSemaphore = Semaphore(max(0, 1 - len(self.parent)))
         self.plugins = nodeInfo.get('plugins', {})
-        self.action = nodeInfo['action']
         self.sonSemaphore = {}
+        self.params = param
         NodePool().addNode(self)
+        self.action = list(map(self.bindActionParam, nodeInfo['action']))
         for parentId in self.parent:
             parentNode = NodePool().getNode(parentId)
             if parentNode:
@@ -53,22 +55,39 @@ class Node(AnubisRoot):
             sonNode = NodePool().getNode(s)
             self.sonSemaphore[sonNode.id] = sonNode.selfSemaphore
 
+    def dealWithSonNode(self):
+        for s in self.sonSemaphore:
+            self.sonSemaphore[s].release()
+
     def run(self):
         for i in range(len(self.parent)):
             self.selfSemaphore.acquire()
-        if len(ErrorStack()) > 0:
-            self.registSonSemaphore()
-            for s in self.sonSemaphore:
-                self.sonSemaphore[s].release()
-            return
-        self.runAction()
         self.registSonSemaphore()
-        for s in self.sonSemaphore:
-            self.sonSemaphore[s].release()
+        if len(ErrorStack()) > 0:
+            self.dealWithSonNode()
+            return
+        try:
+            self.runAction()
+        except Exception as e:
+            raise e
+        finally:
+            self.dealWithSonNode()
 
     def registPlugin(self):
         for pName in self.plugins:
             PluginManager().registPlugin(self.run, pName, self.plugins[pName])
+
+    def bindActionParam(self, action):
+        '''
+        注册参数
+        :param str action:
+        :return:
+        '''
+        comp = re.compile(Const.ACTION_PARAM_REGEX)
+        findRes = comp.findall(action)
+        for f in findRes:
+            action = action.replace(f[0], self.params[f[1]])
+        return action
 
     def runAction(self):
         startTime = time.ctime()
@@ -76,11 +95,16 @@ class Node(AnubisRoot):
         for action in self.action:
             aStartTime = time.ctime()
             aStartTimeStamp = time.time()
-            output, status = runCommand(action, )
+            output, status = runCommand(action)
+            Log().log('''
+Run Command : %s
+Command Status Code : %s
+Command Output : %s
+''' % (action, status, output))
             if status:
                 Log().error(self.taskName, self.id, self.desc, startTime, time.ctime())
                 raise ActionError(self.taskName, self.id, self.desc, action, status, output, aStartTime)
             else:
-                Log().log(self.taskName, self.id, self.desc, action, output, aStartTime,
+                Log().log(self.taskName, self.id, self.desc, action, aStartTime,
                           int(time.time() - aStartTimeStamp))
         Log().log(self.taskName, self.id, self.desc, startTime, time.time() - startTimeStamp)

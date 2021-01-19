@@ -14,3 +14,11 @@ DEFAULT_KEY = "GAME_NAME"
 
 LOG_PATH = "./task.log"
 ERRORLOG_PATH = "./error.log"
+
+ACTION_PARAM_REGEX = "({{ *([a-zA-Z_][a-zA-Z0-9_]*?) *}})"
+
+import re
+
+c = re.compile(ACTION_PARAM_REGEX)
+
+print(c.findall("{[ dfsada }} {{ dsad }} {{dsazx  }}"))

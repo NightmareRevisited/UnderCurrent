@@ -1,0 +1,295 @@
+{
+  "name": "ServerPackage",
+  "desc": "服务端打包",
+  "plugins": {
+  },
+  "params": {
+    "backend_url": {
+      "type": "str"
+    },
+    "TOOLS_TAG": {
+      "type": "str",
+      "default": ""
+    },
+    "CA_BRANCH": {
+      "type": "str"
+    },
+    "packages_path_base": {
+      "type": "str"
+    },
+    "VMS_TAG": {
+      "type": "str"
+    },
+    "GLOBAL_TAG": {
+      "type": "str"
+    },
+    "package_path": {
+      "type": "str"
+    },
+    "version_path": {
+      "type": "str"
+    },
+    "CONNECTOR_TAG": {
+      "type": "str",
+      "default": ""
+    },
+    "config_url": {
+      "type": "str"
+    },
+    "UPGRADE_PATH": {
+      "type": "str"
+    },
+    "filecache_path": {
+      "type": "str"
+    },
+    "version": {
+      "type": "str"
+    },
+    "connector_url": {
+      "type": "str",
+      "default": ""
+    },
+    "MATCHSERVER_TAG": {
+      "type": "str",
+      "default": ""
+    },
+    "global_url": {
+      "type": "str"
+    },
+    "tools_path": {
+      "type": "str"
+    },
+    "packages": {
+      "type": "str"
+    },
+    "webroot_path": {
+      "type": "str"
+    },
+    "tools_url": {
+      "type": "str",
+      "default": ""
+    },
+    "META_TAG": {
+      "type": "str",
+      "default": ""
+    },
+    "kakura_url": {
+      "type": "str"
+    },
+    "KAKURA_TAG": {
+      "type": "str"
+    },
+    "meta_url": {
+      "type": "str",
+      "default": ""
+    },
+    "GAME_NAME": {
+      "type": "str"
+    },
+    "BACKEND_TAG": {
+      "type": "str"
+    },
+    "matchserver_url": {
+      "type": "str",
+      "default": ""
+    },
+    "CONFIG": {
+      "type": "str"
+    },
+    "vms_url": {
+      "type": "str"
+    }
+  },
+  "nodes": [
+    {
+      "desc": "创建目录",
+      "id": "createPath",
+      "parent": [
+      ],
+      "plugins": {
+      },
+      "params": [
+        "version_path"
+      ],
+      "action": [
+        "mkdir -p {{version_path}}"
+      ]
+    },
+    {
+      "desc": "Backend打包",
+      "id": "BackendPackage",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "action": [
+        "cd {{version_path}};mkdir backend && cd backend;git clone {{backend_url}} {{BACKEND_TAG}} && cd {{BACKEND_TAG}};git checkout {{BACKEND_TAG}} && /usr/local/bin/php composer.phar install"
+      ]
+    },
+    {
+      "desc": "Global打包",
+      "id": "GlobalPackage",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "action": [
+        "cd {{version_path}};mkdir global && cd global;git clone {{global_url}} {{GLOBAL_TAG}} && cd {{GLOBAL_TAG}};git checkout {{GLOBAL_TAG}} && /usr/local/bin/php composer.phar install"
+      ]
+    },
+    {
+      "desc": "VMS打包",
+      "id": "VmsPackage",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "action": [
+        "cd {{version_path}};mkdir vms && cd vms;git clone {{vms_url}} {{VMS_TAG}} && cd {{VMS_TAG}};git checkout {{VMS_TAG}}"
+      ]
+    },
+    {
+      "desc": "Kakura打包",
+      "id": "KakuraPackage",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "action": [
+        "cd {{version_path}};mkdir kakura && cd kakura;git clone {{kakura_url}} {{KAKURA_TAG}} && cd {{KAKURA_TAG}};git checkout {{KAKURA_TAG}}"
+      ]
+    },
+    {
+      "desc": "更新",
+      "id": "UpdateWalle",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "action": [
+        "cd /work/hifive/hifive_walle;git reset --hard;git pull;cp config.example.yaml config.yaml;sed -i '' 's/{project_name}/{{GAME_NAME}}/g' config.yaml"
+      ]
+    },
+    {
+      "desc": "配置文件更新",
+      "id": "ConfigPackage",
+      "parent": [
+        "UpdateWalle",
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "action": [
+        "cd {{version_path}};mkdir config && cd config;svn co {{config_url}} {{CONFIG}} -r {{CONFIG}};python2.7 tool.py --inputPath /work/release/{{GAME_NAME}}/{{packages}}/playcrab/{{GAME_NAME}}/version/config/{{CONFIG}} --outputPath /work/release/{{GAME_NAME}}/{{packages}}/playcrab/{{GAME_NAME}}/version/config/test export_csv_to_php q;cd {{version_path}}/config;rm -rf {{CONFIG}};cp -r test {{CONFIG}};rm -rf test"
+      ]
+    },
+    {
+      "desc": "Matchserver打包",
+      "id": "MatchserverPackage",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "optParams": {
+        "matchserver_url": "",
+        "MATCHSERVER_TAG": ""
+      },
+      "action": [
+        "if [ {{MATCHSERVER_TAG}} ] ; then cd {{version_path}};mkdir matchserver && cd matchserver;git clone {{matchserver_url}} {{MATCHSERVER_TAG}};cd {{MATCHSERVER_TAG}};git checkout {{MATCHSERVER_TAG}};make package; fi"
+      ]
+    },
+    {
+      "desc": "Connector打包",
+      "id": "ConnectorPackage",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "optParams": {
+        "connector_url": "",
+        "CONNECTOR_TAG": ""
+      },
+      "action": [
+        "if [ {{CONNECTOR_TAG}} ] ; then mkdir -p {{webroot_path}}  && cd {{webroot_path}};git clone {{connector_url}} connector;cd connector;git checkout {{CONNECTOR_TAG}};fi"
+      ]
+    },
+    {
+      "desc": "Meta打包",
+      "id": "MetaPackage",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "optParams": {
+        "meta_url": "",
+        "META_TAG": ""
+      },
+      "action": [
+        "if [ {{META_TAG}} ] ; then mkdir -p {{filecache_path}}/config/vms && cd {{filecache_path}};git clone {{meta_url}} ${GAME_NAME}_meta_templates;cd ${GAME_NAME}_meta_templates;git checkout {{META_TAG}}; fi"
+      ]
+    },
+    {
+      "desc": "Tools打包",
+      "id": "ToolsPackage",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "optParams": {
+        "tools_url": "",
+        "TOOLS_TAG": ""
+      },
+      "action": [
+        "if [ {{TOOLS_TAG}} ] ; then git clone -b {{GAME_NAME}} {{tools_url}} {{tools_path}};cd {{tools_path}};git checkout {{TOOLS_TAG}};fi"
+      ]
+    },
+    {
+      "desc": "记录版本信息",
+      "id": "WriteVersionInfo",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "action": [
+        "cd {{version_path}};mkdir versioninfo  && cd versioninfo;mkdir {{version}} && cd {{version}};echo \\\"<?php return array (\\\">> info.php;echo \\\\\\\"time\\\\\\\"=\\>\\\\\\\"`date \\\"+%F %T\\\"`\\\\\\\", >> info.php;echo \\\\\\\"kakura_tag\\\\\\\"=\\>\\\\\\\"{{KAKURA_TAG}}\\\\\\\", >> info.php;echo \\\\\\\"config_tag\\\\\\\"=\\>\\\\\\\"{{CONFIG}}\\\\\\\", >> info.php;echo \\\\\\\"upgrade_path\\\\\\\"=\\>\\\\\\\"{{UPGRADE_PATH}}\\\\\\\", >> info.php;echo \\\\\\\"version\\\\\\\"=\\>{{version}}, >> info.php;echo \\\\\\\"os_platform\\\\\\\"=\\>\\\\\\\"ios\\\\\\\", >> info.php;echo \\\\\\\"matchserver_tag\\\\\\\"=\\>\\\\\\\"{{MATCHSERVER_TAG}}\\\\\\\", >> info.php;echo \\\\\\\"vms_tag\\\\\\\"=\\>\\\\\\\"{{VMS_TAG}}\\\\\\\", >> info.php;echo \\\\\\\"backend_tag\\\\\\\"=\\>\\\\\\\"{{BACKEND_TAG}}\\\\\\\", >> info.php;echo \\\\\\\"global_tag\\\\\\\"=\\>\\\\\\\"{{GLOBAL_TAG}}\\\\\\\", >> info.php;echo \\\");\\\" >> info.php",
+        "cd {{version_path}};cd versioninfo;cd {{version}};echo time=\\\\\\\"`date \\\"+%F %T\\\"`\\\\\\\" >> info.sh;echo kakura_tag=\\\\\\\"{{KAKURA_TAG}}\\\\\\\" >> info.sh;echo config_tag=\\\\\\\"{{CONFIG}}\\\\\\\"  >> info.sh;echo upgrade_path=\\\\\\\"{{UPGRADE_PATH}}\\\\\\\"  >> info.sh;echo os_platform=\\\\\\\"ios\\\\\\\" >> info.sh;echo version=\\\\\\\"{{version}}\\\\\\\" >> info.sh;echo vms_tag=\\\\\\\"{{VMS_TAG}}\\\\\\\" >> info.sh;echo backend_tag=\\\\\\\"{{BACKEND_TAG}}\\\\\\\" >> info.sh;echo global_tag=\\\\\\\"{{GLOBAL_TAG}}\\\\\\\" >> info.sh;echo matchserver_tag=\\\\\\\"{{MATCHSERVER_TAG}}\\\\\\\" >> info.sh;echo ca_branch=\\\\\\\"{{CA_BRANCH}}\\\\\\\" >> info.sh;",
+        "cd {{version_path}};cd versioninfo;cd {{version}};echo time: \\\\\\\"`date \\\"+%F %T\\\"`\\\\\\\" >> info.yaml;echo kakura_tag: {{KAKURA_TAG}} >> info.yaml;echo config_tag: \\\\\\\"{{CONFIG}}\\\\\\\"  >> info.yaml;echo upgrade_path: {{UPGRADE_PATH}}  >> info.yaml;echo os_platform: ios >> info.yaml;echo global_tag: {{GLOBAL_TAG}} >> info.yaml;echo version: \\\\\\\"{{version}}\\\\\\\" >> info.yaml;echo vms_tag: {{VMS_TAG}} >> info.yaml;echo backend_tag: {{BACKEND_TAG}} >> info.yaml;echo global_tag: {{GLOBAL_TAG}} >> info.yaml;echo ca_branch: {{CA_BRANCH}} >> info.yaml;echo matchserver_tag: {{MATCHSERVER_TAG}} >> info.yaml;echo '<?php return array ();' >> update.php"
+      ]
+    },
+    {
+      "desc": "提交版本信息",
+      "id": "commitVersionInfo",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "action": [
+        "cp -rf {{version_path}}/versioninfo/{{version}}/ {{packages_path_base}}/version/{{GAME_NAME}}/{{version}}/",
+        "cd {{packages_path_base}}/version;svn add * --force;svn commit -m '[version:{{version}}]版本信息变更'"
+      ]
+    },
+    {
+      "desc": "提交版本信息",
+      "id": "commitVersionInfo",
+      "parent": [
+        "createPath"
+      ],
+      "plugins": {
+      },
+      "action": [
+        "cd {{package_path}};gtar -zcf ../${packages}.tar.gz --exclude=*.svn --exclude=*.git --exclude=apk --exclude=snop --exclude=*.tgz --exclude=*.apk --exclude=*.tmp --exclude=*.ipa --exclude=*.log --exclude=*.txt --exclude=*.bz2 ./*"
+      ]
+    }
+  ]
+}

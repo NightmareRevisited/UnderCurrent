@@ -48,7 +48,7 @@ def loadConfig(taskName, configName=DEFAULT_NAME):
     with open(cFile, 'r') as f:
         try:
             return json.load(f)
-        except json.JSONDecodeError as e:
-            raise AnubisError("Job %s - %s config json error!\nLocation: %s" % (taskName, configName, e.message))
+        except ValueError as e:
+            raise AnubisError("Job %s - %s config json error!\nLocation: %s" % (taskName, cFile, e.message))
         except Exception as e:
             raise e

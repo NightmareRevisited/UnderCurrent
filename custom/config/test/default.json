@@ -13,9 +13,10 @@
       "plugins": {
         
       },
-      "action": {
-
-      }
+      "params": ["test"],
+      "action": [
+        "{{ test }} 1"
+      ]
     },
     {
       "desc":"节点2",

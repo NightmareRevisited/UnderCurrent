@@ -5,6 +5,7 @@
 # @author: NightmareRevisited
 # @file: Anubis.py
 # @time: 2021/1/13 14:05
+import re
 
 from internal.base.AnubisRoot import AnubisRoot
 from internal.configs.Config import *
@@ -23,7 +24,7 @@ class Anubis(AnubisRoot):
         :param dict param:
         '''
         self.taskName = taskName
-        self.param = param
+        self.params = param
         self.nodes = []
         self.startTime = time.ctime()
         self.startTimeStamp = time.time()
@@ -32,14 +33,41 @@ class Anubis(AnubisRoot):
 
     def load_config(self):
         PARAM_KEY = getKey(self.taskName)
-        KEY = self.param[PARAM_KEY]
+        KEY = self.params[PARAM_KEY]
         config = loadConfig(self.taskName, KEY)
         self.name = config['name']
         self.desc = config['desc']
         self.plugins = config.get("plugins", [])
         for nodeInfo in config['nodes']:
-            self.nodes.append(Node(self.taskName, nodeInfo, self.param))
+            self.nodes.append(Node(self.taskName, nodeInfo, self.params))
         self.semaphore = Semaphore(max(0, 1 - len(self.nodes)))
+        self.registParam(config['params'])
+
+    def registParam(self, paramDefine):
+        '''
+        注册参数
+        :param dict paramDefine:
+        :return:
+        '''
+        p = {}
+        for pName, define in paramDefine.items():
+            if "default" in define:
+                p[pName] = self.checkParam(self.params.get(pName, define['default']), define['type'])
+            else:
+                p[pName] = self.checkParam(self.params[pName], define['type'])
+        self.params = p
+
+    def checkParam(self, value, type):
+        if type == "string":
+            return str(value)
+        elif type == "int":
+            return int(value)
+        elif type == "float":
+            return float(value)
+        elif type == "list":
+            return list(json.loads(value))
+        elif type == "dict":
+            return json.loads(value)
 
     def run(self):
         def runNode(node):
