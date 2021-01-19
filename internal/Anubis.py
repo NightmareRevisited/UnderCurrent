@@ -68,6 +68,8 @@ class Anubis(AnubisRoot):
             return list(json.loads(value))
         elif type == "dict":
             return json.loads(value)
+        else:
+            raise AnubisError("Invalid Param Type: " + type)
 
     def run(self):
         def runNode(node):

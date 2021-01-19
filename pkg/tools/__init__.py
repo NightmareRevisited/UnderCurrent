@@ -20,7 +20,10 @@ def runWindowsCommand(cmd, ignore):
     execute = os.popen(cmd, "r")
     output = execute.read()
     status = execute.close()
-    status = status if status else 0
+    if status:
+        output = execute.errors
+    else:
+        status = 0
     if ignore:
         status = 0
     return output, status
