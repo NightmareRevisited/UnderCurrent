@@ -270,7 +270,7 @@
       "desc": "提交版本信息",
       "id": "commitVersionInfo",
       "parent": [
-        "createPath"
+        "WriteVersionInfo"
       ],
       "plugins": {
       },
@@ -280,10 +280,19 @@
       ]
     },
     {
-      "desc": "提交版本信息",
-      "id": "commitVersionInfo",
+      "desc": "打压缩包",
+      "id": "tar",
       "parent": [
-        "createPath"
+        "BackendPackage",
+        "GlobalPackage",
+        "VmsPackage",
+        "KakuraPackage",
+        "ConfigPackage",
+        "MatchserverPackage",
+        "ConnectorPackage",
+        "MetaPackage",
+        "ToolsPackage",
+        "WriteVersionInfo"
       ],
       "plugins": {
       },
