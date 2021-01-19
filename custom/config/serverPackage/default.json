@@ -5,99 +5,99 @@
   },
   "params": {
     "backend_url": {
-      "type": "str"
+      "type": "string"
     },
     "TOOLS_TAG": {
-      "type": "str",
+      "type": "string",
       "default": ""
     },
     "CA_BRANCH": {
-      "type": "str"
+      "type": "string"
     },
     "packages_path_base": {
-      "type": "str"
+      "type": "string"
     },
     "VMS_TAG": {
-      "type": "str"
+      "type": "string"
     },
     "GLOBAL_TAG": {
-      "type": "str"
+      "type": "string"
     },
     "package_path": {
-      "type": "str"
+      "type": "string"
     },
     "version_path": {
-      "type": "str"
+      "type": "string"
     },
     "CONNECTOR_TAG": {
-      "type": "str",
+      "type": "string",
       "default": ""
     },
     "config_url": {
-      "type": "str"
+      "type": "string"
     },
     "UPGRADE_PATH": {
-      "type": "str"
+      "type": "string"
     },
     "filecache_path": {
-      "type": "str"
+      "type": "string"
     },
     "version": {
-      "type": "str"
+      "type": "string"
     },
     "connector_url": {
-      "type": "str",
+      "type": "string",
       "default": ""
     },
     "MATCHSERVER_TAG": {
-      "type": "str",
+      "type": "string",
       "default": ""
     },
     "global_url": {
-      "type": "str"
+      "type": "string"
     },
     "tools_path": {
-      "type": "str"
+      "type": "string"
     },
     "packages": {
-      "type": "str"
+      "type": "string"
     },
     "webroot_path": {
-      "type": "str"
+      "type": "string"
     },
     "tools_url": {
-      "type": "str",
+      "type": "string",
       "default": ""
     },
     "META_TAG": {
-      "type": "str",
+      "type": "string",
       "default": ""
     },
     "kakura_url": {
-      "type": "str"
+      "type": "string"
     },
     "KAKURA_TAG": {
-      "type": "str"
+      "type": "string"
     },
     "meta_url": {
-      "type": "str",
+      "type": "string",
       "default": ""
     },
     "GAME_NAME": {
-      "type": "str"
+      "type": "string"
     },
     "BACKEND_TAG": {
-      "type": "str"
+      "type": "string"
     },
     "matchserver_url": {
-      "type": "str",
+      "type": "string",
       "default": ""
     },
     "CONFIG": {
-      "type": "str"
+      "type": "string"
     },
     "vms_url": {
-      "type": "str"
+      "type": "string"
     }
   },
   "nodes": [
