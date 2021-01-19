@@ -20,5 +20,3 @@ ACTION_PARAM_REGEX = "({{ *([a-zA-Z_][a-zA-Z0-9_]*?) *}})"
 import re
 
 c = re.compile(ACTION_PARAM_REGEX)
-
-print(c.findall("{[ dfsada }} {{ dsad }} {{dsazx  }}"))
