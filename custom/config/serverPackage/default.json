@@ -185,7 +185,7 @@
       "plugins": {
       },
       "action": [
-        "cd {{version_path}};mkdir config && cd config;svn co {{config_url}} {{CONFIG}} -r {{CONFIG}};python2.7 cd /work/hifive/hifive_walle/tool.py --inputPath /work/release/{{GAME_NAME}}/{{packages}}/playcrab/{{GAME_NAME}}/version/config/{{CONFIG}} --outputPath /work/release/{{GAME_NAME}}/{{packages}}/playcrab/{{GAME_NAME}}/version/config/test export_csv_to_php q;cd {{version_path}}/config;rm -rf {{CONFIG}};cp -r test {{CONFIG}};rm -rf test"
+        "cd {{version_path}};mkdir config && cd config;svn co {{config_url}} {{CONFIG}} -r {{CONFIG}};python2.7 /work/hifive/hifive_walle/tool.py --inputPath /work/release/{{GAME_NAME}}/{{packages}}/playcrab/{{GAME_NAME}}/version/config/{{CONFIG}} --outputPath /work/release/{{GAME_NAME}}/{{packages}}/playcrab/{{GAME_NAME}}/version/config/test export_csv_to_php q;cd {{version_path}}/config;rm -rf {{CONFIG}};cp -r test {{CONFIG}};rm -rf test"
       ]
     },
     {
