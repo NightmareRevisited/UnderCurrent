@@ -78,11 +78,12 @@ class Log(Singleton):
         self._stdoutThread.setDaemon(True)
         self._stdoutThread.start()
 
-    def exit(self):
+    def exit(self,code):
         self._prepare2Exit = True
         self._logExitSema = Semaphore(0)
         self._errorExitSema = Semaphore(0)
-        self.log("Exit 0", time.ctime())
-        self.error("Exit 0", time.ctime())
+        self.log("Exit %d" % code, time.ctime())
+        self.error("Exit %d" % code, time.ctime())
         self._logExitSema.acquire()
         self._errorExitSema.acquire()
+        sys.exit(code)

@@ -26,6 +26,7 @@ class Anubis(AnubisRoot):
         self.taskName = taskName
         self.params = param
         self.nodes = []
+        self.exitCode = 0
         self.startTime = time.ctime()
         self.startTimeStamp = time.time()
 
@@ -76,6 +77,7 @@ class Anubis(AnubisRoot):
             try:
                 node.run()
             except Exception as e:
+                self.exitCode = 1 #异常码暂定1
                 ErrorStack().add(e)
             self.semaphore.release()
 
@@ -93,4 +95,4 @@ class Anubis(AnubisRoot):
             Log().error(self.taskName, self.name, self.desc, self.startTime, time.ctime())
         else:
             Log().log(self.taskName, self.name, self.desc, self.startTime, time.time() - self.startTimeStamp)
-        Log().exit()
+        Log().exit(self.exitCode)
