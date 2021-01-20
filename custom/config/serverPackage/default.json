@@ -265,10 +265,10 @@
       },
       "action": [
         "cd {{version_path}};mkdir versioninfo  && cd versioninfo;mkdir {{version}}",
-        "cd {{version_path}};cd versioninfo;cd {{version}};echo '<?php return array (\n\"time\"=>\"{{date}}\"`\",\n\"kakura_tag\"=>\"{{KAKURA_TAG}}\",\n\"config_tag\"=>\"{{CONFIG}}\",\n\"upgrade_path\"=>\"{{UPGRADE_PATH}}\",\n\"version\"=>{{version}},\n\"os_platform\"=>\"ios\",\n\"vms_tag\"=>\"{{VMS_TAG}}\",\n\"backend_tag\"=>\"{{BACKEND_TAG}}\",\n\"global_tag\"=>\"{{GLOBAL_TAG}}\",\n);' > info.php",
-        "cd {{version_path}};cd versioninfo;cd {{version}};echo 'time=\"{{date}}\"\nkakura_tag=\"{{KAKURA_TAG}}\"\nconfig_tag=\"{{version}}\"\nupgrade_path=\"{{UPGRADE_PATH}}\"\nos_platform=\"ios\"\nversion=\"{{version}}\"\nvms_tag=\"{{VMS_TAG}}\"\nbackend_tag=\"{{BACKEND_TAG}}\"\nglobal_tag=\"{{GLOBAL_TAG}}\"\nca_branch=\"dev\"' > info.sh;",
-        "cd {{version_path}};cd versioninfo;cd {{version}};echo 'time: \"{{date}}\"\nkakura_tag: {{KAKURA_TAG}}\nconfig_tag: \"{{version}}\"\nupgrade_path: {{UPGRADE_PATH}}\nos_platform: ios\nglobal_tag: {{GLOBAL_TAG}}\nversion: \"{{version}}\"\nvms_tag: {{VMS_TAG}}\nbackend_tag: {{BACKEND_TAG}}\nca_branch: dev\nglobal_tag: {{GLOBAL_TAG}}' > info.yaml",
-        "cd {{version_path}};cd versioninfo;cd {{version}};echo '<?php return array ();' > update.php"
+        "echo '<?php return array (\n\"time\"=>\"{{date}}\",\n\"kakura_tag\"=>\"{{KAKURA_TAG}}\",\n\"config_tag\"=>\"{{CONFIG}}\",\n\"upgrade_path\"=>\"{{UPGRADE_PATH}}\",\n\"version\"=>{{version}},\n\"os_platform\"=>\"ios\",\n\"vms_tag\"=>\"{{VMS_TAG}}\",\n\"backend_tag\"=>\"{{BACKEND_TAG}}\",\n\"global_tag\"=>\"{{GLOBAL_TAG}}\",\n);' > {{version_path}}/versioninfo/{{version}}/info.php",
+        "echo 'time=\"{{date}}\"\nkakura_tag=\"{{KAKURA_TAG}}\"\nconfig_tag=\"{{version}}\"\nupgrade_path=\"{{UPGRADE_PATH}}\"\nos_platform=\"ios\"\nversion=\"{{version}}\"\nvms_tag=\"{{VMS_TAG}}\"\nbackend_tag=\"{{BACKEND_TAG}}\"\nglobal_tag=\"{{GLOBAL_TAG}}\"\nca_branch=\"dev\"' > {{version_path}}/versioninfo/{{version}}/info.sh;",
+        "echo 'time: \"{{date}}\"\nkakura_tag: {{KAKURA_TAG}}\nconfig_tag: \"{{version}}\"\nupgrade_path: {{UPGRADE_PATH}}\nos_platform: ios\nglobal_tag: {{GLOBAL_TAG}}\nversion: \"{{version}}\"\nvms_tag: {{VMS_TAG}}\nbackend_tag: {{BACKEND_TAG}}\nca_branch: dev\nglobal_tag: {{GLOBAL_TAG}}' > {{version_path}}/versioninfo/{{version}}/info.yaml",
+        "echo '<?php return array ();' > update.php"
       ]
     },
     {
