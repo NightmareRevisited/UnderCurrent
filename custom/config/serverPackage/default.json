@@ -236,7 +236,7 @@
         "META_TAG": ""
       },
       "action": [
-        "if [ {{META_TAG}} ] ; then mkdir -p {{filecache_path}}/config/vms && cd {{filecache_path}};git clone {{meta_url}} ${GAME_NAME}_meta_templates;cd ${GAME_NAME}_meta_templates;git checkout {{META_TAG}}; fi"
+        "if [ {{META_TAG}} ] ; then mkdir -p {{filecache_path}}/config/vms && cd {{filecache_path}};git clone {{meta_url}} {{GAME_NAME}}_meta_templates;cd {{GAME_NAME}}_meta_templates;git checkout {{META_TAG}}; fi"
       ]
     },
     {
@@ -302,7 +302,7 @@
       "plugins": {
       },
       "action": [
-        "cd {{package_path}};gtar -zcf ../${packages}.tar.gz --exclude=*.svn --exclude=*.git --exclude=apk --exclude=snop --exclude=*.tgz --exclude=*.apk --exclude=*.tmp --exclude=*.ipa --exclude=*.log --exclude=*.txt --exclude=*.bz2 ./*"
+        "cd {{package_path}};gtar -zcf ../{{packages}}.tar.gz --exclude=*.svn --exclude=*.git --exclude=apk --exclude=snop --exclude=*.tgz --exclude=*.apk --exclude=*.tmp --exclude=*.ipa --exclude=*.log --exclude=*.txt --exclude=*.bz2 ./*"
       ]
     }
   ]
