@@ -199,10 +199,6 @@
       ],
       "plugins": {
       },
-      "optParams": {
-        "matchserver_url": "",
-        "MATCHSERVER_TAG": ""
-      },
       "action": [
         "if [ {{MATCHSERVER_TAG}} ] ; then cd {{version_path}};mkdir matchserver && cd matchserver;git clone {{matchserver_url}} {{MATCHSERVER_TAG}};cd {{MATCHSERVER_TAG}};git checkout {{MATCHSERVER_TAG}};make package; fi"
       ]
@@ -214,10 +210,6 @@
         "createPath"
       ],
       "plugins": {
-      },
-      "optParams": {
-        "connector_url": "",
-        "CONNECTOR_TAG": ""
       },
       "action": [
         "if [ {{CONNECTOR_TAG}} ] ; then mkdir -p {{webroot_path}}  && cd {{webroot_path}};git clone {{connector_url}} connector;cd connector;git checkout {{CONNECTOR_TAG}};fi"
@@ -231,10 +223,6 @@
       ],
       "plugins": {
       },
-      "optParams": {
-        "meta_url": "",
-        "META_TAG": ""
-      },
       "action": [
         "if [ {{META_TAG}} ] ; then mkdir -p {{filecache_path}}/config/vms && cd {{filecache_path}};git clone {{meta_url}} {{GAME_NAME}}_meta_templates;cd {{GAME_NAME}}_meta_templates;git checkout {{META_TAG}}; fi"
       ]
@@ -246,10 +234,6 @@
         "createPath"
       ],
       "plugins": {
-      },
-      "optParams": {
-        "tools_url": "",
-        "TOOLS_TAG": ""
       },
       "action": [
         "if [ {{TOOLS_TAG}} ] ; then git clone -b {{GAME_NAME}} {{tools_url}} {{tools_path}};cd {{tools_path}};git checkout {{TOOLS_TAG}};fi"
