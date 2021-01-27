@@ -80,7 +80,7 @@ class Anubis(AnubisRoot):
             raise AnubisError("Invalid Param Type: " + type)
 
     def run(self):
-        Log.log("@@@@@@@@@@@@@ %s 任务开始 @@@@@@@@@@@@@@@@@@" % self.taskName)
+        Log().log("@@@@@@@@@@@@@ %s 任务开始 @@@@@@@@@@@@@@@@@@" % self.taskName)
 
         def runNode(node):
             try:
