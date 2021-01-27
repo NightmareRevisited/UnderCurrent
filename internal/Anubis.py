@@ -17,31 +17,38 @@ import time
 
 
 class Anubis(AnubisRoot):
-    def __init__(self, taskName, param):
+
+    def __init__(self, controller):
         '''
         初始化
-        :param str taskName:
-        :param dict param:
+        :param AnubisController controller:
         '''
-        self.taskName = taskName
-        self.params = param
+        self.controller = controller
+        self.params = controller.TaskParam
         self.nodes = []
         self.exitCode = 0
+        self.finishedNode = 0
         self.startTime = time.ctime()
         self.startTimeStamp = time.time()
-
         self.load_config()
+        self.errornode = []
 
     def load_config(self):
-        PARAM_KEY = getKey(self.taskName)
-        KEY = self.params[PARAM_KEY]
-        config = loadConfig(self.taskName, KEY)
+        if self.controller.ConfFile:
+            with open(self.controller.ConfFile, 'r') as f:
+                config = json.load(f)
+                self.taskName = config['name']
+        else:
+            self.taskName = self.controller.TaskName
+            PARAM_KEY = getKey(self.taskName)
+            KEY = self.params[PARAM_KEY]
+            config = loadConfig(self.taskName, KEY)
         self.registParam(config['params'])
         self.name = config['name']
         self.desc = config['desc']
         self.plugins = config.get("plugins", [])
         for nodeInfo in config['nodes']:
-            self.nodes.append(Node(self.taskName, nodeInfo, self.params))
+            self.nodes.append(Node(self, nodeInfo))
         self.semaphore = Semaphore(max(0, 1 - len(self.nodes)))
 
     def registParam(self, paramDefine):
@@ -73,17 +80,21 @@ class Anubis(AnubisRoot):
             raise AnubisError("Invalid Param Type: " + type)
 
     def run(self):
+        Log.log("@@@@@@@@@@@@@ %s 任务开始 @@@@@@@@@@@@@@@@@@" % self.taskName)
+
         def runNode(node):
             try:
                 node.run()
             except Exception as e:
-                self.exitCode = 1 #异常码暂定1
+                self.errornode.append(node.id)
+                self.exitCode = 1  # 异常码暂定1
                 ErrorStack().add(e)
             self.semaphore.release()
 
         for node in self.nodes:
             t = Thread(target=runNode, args=[node])
             t.start()
+
         self.finish()
 
     def finish(self):
@@ -92,7 +103,16 @@ class Anubis(AnubisRoot):
         self.endTime = time.ctime()
         if len(ErrorStack()) > 0:
             ErrorStack().logError()
-            Log().error(self.taskName, self.name, self.desc, self.startTime, time.ctime())
-        else:
-            Log().log(self.taskName, self.name, self.desc, self.startTime, time.time() - self.startTimeStamp)
+
+        Log().log("""
+################################
+TaskName:  %s
+TaskDesc:  %s
+StartTime: %s
+CostTime:  %.2f
+FinishedStatus:   %d/%d
+ErrorNode: %s
+################################
+""" % (self.taskName, self.desc, self.startTime, time.time() - self.startTimeStamp, self.finishedNode, len(self.nodes),
+       " ".join(self.errornode)))
         Log().exit(self.exitCode)

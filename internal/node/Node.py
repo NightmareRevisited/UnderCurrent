@@ -30,17 +30,19 @@ class Node(AnubisRoot):
         'sonSemaphore',
     ]
 
-    def __init__(self, taskName, nodeInfo, param):
-        self.taskName = taskName
+    def __init__(self, root, nodeInfo):
+        self.root = root
+        self.taskName = root.taskName
         self.id = nodeInfo['id']
         self.desc = nodeInfo['desc']
         self.parent = nodeInfo.get("parent", [])
         self.selfSemaphore = Semaphore(max(0, 1 - len(self.parent)))
         self.plugins = nodeInfo.get('plugins', {})
         self.sonSemaphore = {}
-        self.params = param
+        self.params = root.params
         NodePool().addNode(self)
         self.action = list(map(self.bindActionParam, nodeInfo['action']))
+        self.finishedAction = 0
         for parentId in self.parent:
             parentNode = NodePool().getNode(parentId)
             if parentNode:
@@ -94,17 +96,28 @@ class Node(AnubisRoot):
         startTimeStamp = time.time()
         for action in self.action:
             aStartTime = time.ctime()
-            aStartTimeStamp = time.time()
             output, status = runCommand(action)
             Log().log('''
+=========================
 Run Command : %s
 Command Status Code : %s
 Command Output : %s
+=========================
 ''' % (action, status, output))
             if status:
                 Log().error(self.taskName, self.id, self.desc, startTime, time.ctime())
                 raise ActionError(self.taskName, self.id, self.desc, action, status, output, aStartTime)
             else:
-                Log().log(self.taskName, self.id, self.desc, action, aStartTime,
-                          int(time.time() - aStartTimeStamp))
-        Log().log(self.taskName, self.id, self.desc, startTime, time.time() - startTimeStamp)
+                self.finishedAction += 1
+        self.root.finishedNode += 1
+        Log().log('''
+*********************************************
+NodeName:    %s
+StartTime:  %s
+CostTime:  %.2f
+Action:  
+%s
+FinishedStatus: %d/%d
+*********************************************
+''' % (self.desc, startTime, time.time() - startTimeStamp, "\n".join(self.action), self.finishedAction,
+       len(self.action)))

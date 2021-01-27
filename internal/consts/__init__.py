@@ -17,6 +17,4 @@ ERRORLOG_PATH = "./error.log"
 
 ACTION_PARAM_REGEX = "({{ *([a-zA-Z_][a-zA-Z0-9_]*?) *}})"
 
-import re
-
-c = re.compile(ACTION_PARAM_REGEX)
+INT32_MAX = 2147483647
