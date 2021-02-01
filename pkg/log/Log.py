@@ -24,6 +24,8 @@ class Log(Singleton):
         self._logHandler = []
         self._errorHandler = []
         self._prepare2Exit = False
+        self._logExitSema = Semaphore(0)
+        self._errorExitSema = Semaphore(0)
         self._run()
 
     def log(self, *logData):
@@ -80,8 +82,6 @@ class Log(Singleton):
 
     def exit(self,code):
         self._prepare2Exit = True
-        self._logExitSema = Semaphore(0)
-        self._errorExitSema = Semaphore(0)
         self.log("Exit %d" % code, time.ctime())
         self.error("Exit %d" % code, time.ctime())
         self._logExitSema.acquire()
