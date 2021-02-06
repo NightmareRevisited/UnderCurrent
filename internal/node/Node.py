@@ -26,8 +26,7 @@ class Node(AnubisRoot):
         'plugins',
         'parent',
         'action',
-        'selfSemaphore',
-        'sonSemaphore',
+        'sonNodes',
     ]
 
     def __init__(self, root, nodeInfo):
@@ -36,9 +35,8 @@ class Node(AnubisRoot):
         self.id = nodeInfo['id']
         self.desc = nodeInfo['desc']
         self.parent = nodeInfo.get("parent", [])
-        self.selfSemaphore = Semaphore(max(0, 1 - len(self.parent)))
         self.plugins = nodeInfo.get('plugins', {})
-        self.sonSemaphore = {}
+        self.sonNodes = {}
         self.params = root.params
         NodePool().addNode(self)
         self.action = list(map(self.bindActionParam, nodeInfo['action']))
@@ -46,25 +44,26 @@ class Node(AnubisRoot):
         for parentId in self.parent:
             parentNode = NodePool().getNode(parentId)
             if parentNode:
-                parentNode.sonSemaphore[self.id] = self.selfSemaphore
+                parentNode.sonNodes[self.id] = self
             else:
                 NodePool().registSonNode(parentId, self.id)
         self.registPlugin()
+        if len(self.parent) == 0:
+            self.root.rootNode.append(self)
+        else:
+            self.preposition = Semaphore(len(self.parent)-1)
 
-    def registSonSemaphore(self):
+    def registSonNode(self):
         sonList = NodePool().fetchSonNode(self.id)
         for s in sonList:
-            sonNode = NodePool().getNode(s)
-            self.sonSemaphore[sonNode.id] = sonNode.selfSemaphore
+            self.sonNodes[s] = NodePool().getNode(s)
 
     def dealWithSonNode(self):
-        for s in self.sonSemaphore:
-            self.sonSemaphore[s].release()
+        for s in self.sonNodes:
+            self.root.prepareNode(self.sonNodes[s])
 
     def run(self):
-        for i in range(len(self.parent)):
-            self.selfSemaphore.acquire()
-        self.registSonSemaphore()
+        self.registSonNode()
         if len(ErrorStack()) > 0:
             self.dealWithSonNode()
             return
@@ -88,7 +87,7 @@ class Node(AnubisRoot):
         comp = re.compile(Const.ACTION_PARAM_REGEX)
         findRes = comp.findall(action)
         for f in findRes:
-            action = action.replace(f[0], self.params[f[1]])
+            action = action.replace(f[0], str(self.params[f[1]]))
         return action
 
     def runAction(self):

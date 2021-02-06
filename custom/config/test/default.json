@@ -3,6 +3,11 @@
   "desc": "testtest",
   "plugins": {
   },
+  "params": {
+    "test": {
+      "type": "int"
+    }
+  },
   "nodes": [
     {
       "desc":"节点1",
@@ -13,7 +18,6 @@
       "plugins": {
         
       },
-      "params": ["test"],
       "action": [
         "{{ test }} 1"
       ]

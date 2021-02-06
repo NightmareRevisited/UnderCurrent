@@ -13,6 +13,7 @@ from internal.node.Node import Node
 from threading import Semaphore, Thread
 from internal.exception.ErrorStack import ErrorStack
 from pkg.log.Log import Log
+from pkg.thread.ThreadPool import ThreadPool
 import time
 
 
@@ -32,6 +33,7 @@ class Anubis(AnubisRoot):
         self.startTimeStamp = time.time()
         self.load_config()
         self.errornode = []
+        self.threadPool = ThreadPool()
 
     def load_config(self):
         if self.controller.ConfFile:
@@ -47,6 +49,7 @@ class Anubis(AnubisRoot):
         self.name = config['name']
         self.desc = config['desc']
         self.plugins = config.get("plugins", [])
+        self.rootNode = []
         for nodeInfo in config['nodes']:
             self.nodes.append(Node(self, nodeInfo))
         self.semaphore = Semaphore(max(0, 1 - len(self.nodes)))
@@ -79,21 +82,28 @@ class Anubis(AnubisRoot):
         else:
             raise AnubisError("Invalid Param Type: " + type)
 
+    def runNode(self,node):
+        try:
+            node.run()
+        except Exception as e:
+            self.errornode.append(node.id)
+            self.exitCode = 1  # 异常码暂定1
+            ErrorStack().add(e)
+        self.semaphore.release()
+
+    def prepareNode(self,node):
+        if not node.preposition.acquire(False):
+            self.submitNode(node)
+
+    def submitNode(self,node):
+        self.threadPool.submit(self.runNode, (node,))
+
+
     def run(self):
         Log().log("@@@@@@@@@@@@@ %s 任务开始 @@@@@@@@@@@@@@@@@@" % self.taskName)
 
-        def runNode(node):
-            try:
-                node.run()
-            except Exception as e:
-                self.errornode.append(node.id)
-                self.exitCode = 1  # 异常码暂定1
-                ErrorStack().add(e)
-            self.semaphore.release()
-
-        for node in self.nodes:
-            t = Thread(target=runNode, args=[node])
-            t.start()
+        for node in self.rootNode:
+            self.submitNode(node)
 
         self.finish()
 
