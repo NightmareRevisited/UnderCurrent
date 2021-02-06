@@ -126,3 +126,4 @@ ErrorNode: %s
 """ % (self.taskName, self.desc, self.startTime, time.time() - self.startTimeStamp, self.finishedNode, len(self.nodes),
        " ".join(self.errornode)))
         Log().exit(self.exitCode)
+        exit(self.exitCode)

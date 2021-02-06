@@ -16,6 +16,7 @@ class Worker(Thread):
         Thread.__init__(self)
         self.pool = threadPool
         self.waitStatus = True
+        self.daemon = True
 
     def run(self):
         while True:

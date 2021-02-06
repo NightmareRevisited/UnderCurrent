@@ -86,4 +86,3 @@ class Log(Singleton):
         self.error("Exit %d" % code, time.ctime())
         self._logExitSema.acquire()
         self._errorExitSema.acquire()
-        sys.exit(code)
