@@ -33,7 +33,7 @@ class Anubis(AnubisRoot):
         self.startTimeStamp = time.time()
         self.load_config()
         self.errornode = []
-        self.threadPool = ThreadPool()
+        self.threadPool = ThreadPool(controller.ThreadNum)
 
     def load_config(self):
         if self.controller.ConfFile:
