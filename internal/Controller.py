@@ -80,4 +80,6 @@ class AnubisController(AnubisRoot):
         Log().registErrorLog(open(self.ERROR_LOG_PATH, 'a'))
 
     def run(self):
-        Anubis(self).run()
+        exitcode = Anubis(self).run()
+        Log().exit(exitcode)
+        sys.exit(exitcode)

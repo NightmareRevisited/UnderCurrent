@@ -35,7 +35,6 @@ class Node(AnubisRoot):
         self.id = nodeInfo['id']
         self.desc = nodeInfo['desc']
         self.parent = nodeInfo.get("parent", [])
-        self.plugins = nodeInfo.get('plugins', {})
         self.sonNodes = {}
         self.params = root.params
         NodePool().addNode(self)
@@ -47,11 +46,13 @@ class Node(AnubisRoot):
                 parentNode.sonNodes[self.id] = self
             else:
                 NodePool().registSonNode(parentId, self.id)
+        self.plugins = nodeInfo.get('plugins', {})
+        self.pluginList = []
         self.registPlugin()
         if len(self.parent) == 0:
             self.root.rootNode.append(self)
         else:
-            self.preposition = Semaphore(len(self.parent)-1)
+            self.preposition = Semaphore(len(self.parent) - 1)
 
     def registSonNode(self):
         sonList = NodePool().fetchSonNode(self.id)
@@ -62,7 +63,7 @@ class Node(AnubisRoot):
         for s in self.sonNodes:
             self.root.prepareNode(self.sonNodes[s])
 
-    def run(self):
+    def runNode(self):
         self.registSonNode()
         if len(ErrorStack()) > 0:
             self.dealWithSonNode()
@@ -75,8 +76,9 @@ class Node(AnubisRoot):
             self.dealWithSonNode()
 
     def registPlugin(self):
+        self.pluginManager = PluginManager()
         for pName in self.plugins:
-            PluginManager().registPlugin(self.run, pName, self.plugins[pName])
+            self.pluginManager.registPlugin(pName, self.plugins[pName])
 
     def bindActionParam(self, action):
         '''
@@ -90,7 +92,8 @@ class Node(AnubisRoot):
             action = action.replace(f[0], str(self.params[f[1]]))
         return action
 
-    def runAction(self):
+    def run(self):
+        self.pluginManager.beforeRun()
         startTime = time.ctime()
         startTimeStamp = time.time()
         for action in self.action:
@@ -120,3 +123,4 @@ FinishedStatus: %d/%d
 *********************************************
 ''' % (self.desc, startTime, time.time() - startTimeStamp, "\n".join(self.action), self.finishedAction,
        len(self.action)))
+        self.pluginManager.afterRun()

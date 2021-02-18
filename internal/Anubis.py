@@ -14,6 +14,7 @@ from threading import Semaphore, Thread
 from internal.exception.ErrorStack import ErrorStack
 from pkg.log.Log import Log
 from pkg.thread.ThreadPool import ThreadPool
+from pkg.plugin.PluginManager import PluginManager
 import time
 
 
@@ -48,11 +49,18 @@ class Anubis(AnubisRoot):
         self.registParam(config['params'])
         self.name = config['name']
         self.desc = config['desc']
-        self.plugins = config.get("plugins", [])
+        self.plugins = config.get("plugins", {})
         self.rootNode = []
         for nodeInfo in config['nodes']:
             self.nodes.append(Node(self, nodeInfo))
         self.semaphore = Semaphore(max(0, 1 - len(self.nodes)))
+        self.registPlugin()
+
+    def registPlugin(self):
+        self.pluginManager = PluginManager()
+        for pName in self.plugins:
+            self.pluginManager.registPlugin(pName, self.plugins[pName])
+
 
     def registParam(self, paramDefine):
         '''
@@ -84,7 +92,7 @@ class Anubis(AnubisRoot):
 
     def runNode(self,node):
         try:
-            node.run()
+            node.runNode()
         except Exception as e:
             self.errornode.append(node.id)
             self.exitCode = 1  # 异常码暂定1
@@ -100,12 +108,16 @@ class Anubis(AnubisRoot):
 
 
     def run(self):
+        try:
+            self.pluginManager.beforeRun()
+        except:
+            return 1
         Log().log("@@@@@@@@@@@@@ %s 任务开始 @@@@@@@@@@@@@@@@@@" % self.taskName)
 
         for node in self.rootNode:
             self.submitNode(node)
 
-        self.finish()
+        return self.finish()
 
     def finish(self):
         for i in range(len(self.nodes)):
@@ -125,5 +137,8 @@ ErrorNode: %s
 ################################
 """ % (self.taskName, self.desc, self.startTime, time.time() - self.startTimeStamp, self.finishedNode, len(self.nodes),
        " ".join(self.errornode)))
-        Log().exit(self.exitCode)
-        exit(self.exitCode)
+        try:
+            self.pluginManager.afterRun()
+        except:
+            return 1
+        return self.exitCode
