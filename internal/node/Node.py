@@ -46,8 +46,7 @@ class Node(AnubisRoot):
                 parentNode.sonNodes[self.id] = self
             else:
                 NodePool().registSonNode(parentId, self.id)
-        self.plugins = nodeInfo.get('plugins', {})
-        self.pluginList = []
+        self.plugins = nodeInfo.get('plugins', [])
         self.registPlugin()
         if len(self.parent) == 0:
             self.root.rootNode.append(self)
@@ -77,8 +76,8 @@ class Node(AnubisRoot):
 
     def registPlugin(self):
         self.pluginManager = PluginManager()
-        for pName in self.plugins:
-            self.pluginManager.registPlugin(pName, self.plugins[pName])
+        for pName,kwargs in self.plugins:
+            self.pluginManager.registPlugin(pName, kwargs)
 
     def bindActionParam(self, action):
         '''

@@ -1,8 +1,9 @@
 {
   "name": "test",
   "desc": "testtest",
-  "plugins": {
-  },
+  "plugins": [
+    ["TimePlugin",{}]
+  ],
   "params": {
     "test": {
       "type": "int"
@@ -15,9 +16,7 @@
       "parent":[
         "node4"
       ],
-      "plugins": {
-        
-      },
+      "plugins": [],
       "action": [
       ]
     },
@@ -27,9 +26,7 @@
       "parent":[
         "node4"
       ],
-      "plugins": {
-        "pname" : {}
-      },
+      "plugins": [],
       "action": {
 
       }
@@ -42,9 +39,7 @@
         "node2",
         "node4"
       ],
-      "plugins": {
-
-      },
+      "plugins": [],
       "action": {
 
       }
@@ -54,9 +49,6 @@
       "id":"node4",
       "parent":[
       ],
-      "plugins": {
-
-      },
       "action": {
 
       }

@@ -49,7 +49,7 @@ class Anubis(AnubisRoot):
         self.registParam(config['params'])
         self.name = config['name']
         self.desc = config['desc']
-        self.plugins = config.get("plugins", {})
+        self.plugins = config.get("plugins", [])
         self.rootNode = []
         for nodeInfo in config['nodes']:
             self.nodes.append(Node(self, nodeInfo))
@@ -58,8 +58,8 @@ class Anubis(AnubisRoot):
 
     def registPlugin(self):
         self.pluginManager = PluginManager()
-        for pName in self.plugins:
-            self.pluginManager.registPlugin(pName, self.plugins[pName])
+        for pName,kwargs in self.plugins:
+            self.pluginManager.registPlugin(pName, kwargs)
 
 
     def registParam(self, paramDefine):
