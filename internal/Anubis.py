@@ -146,4 +146,4 @@ ErrorNode: %s
     def checkSomething(self):
         hasCircle, circlePoint = self.graph.hasCircle()
         if hasCircle:
-            raise AnubisError("节点关系中有环存在，请检查配置文件 [ %s ] !" % ','.join(circlePoint))
+            raise AnubisError("节点关系中有环存在，请检查配置文件，成环节点[ %s ]" % ','.join(circlePoint))
