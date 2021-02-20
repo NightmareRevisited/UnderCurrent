@@ -12,11 +12,9 @@ from abc import ABCMeta, abstractmethod
 class PluginBase(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, kwargs):
-        '''
-        :param dict kwargs:
-        '''
-        self.param = kwargs
+    @abstractmethod
+    def __init__(self):
+        pass
 
     @abstractmethod
     def beforeRun(self):

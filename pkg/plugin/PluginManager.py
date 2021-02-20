@@ -7,6 +7,8 @@
 # @time: 2021/1/12 20:23
 
 import importlib
+import Plugin as BasePlugin
+import custom.plugin.Plugin as CustomPlugin
 
 
 # class DispPluginManager(object):
@@ -42,13 +44,14 @@ class PluginManager(object):
 
     def registPlugin(self, pluginName, kwargs):
         try:
-            module = importlib.import_module("Plugin")
-            pluginCls = getattr(module,pluginName)
+            pluginCls = getattr(BasePlugin, pluginName, None)
+            if pluginCls == None:
+                pluginCls = getattr(CustomPlugin, pluginName)
 
         except AttributeError:
             raise AttributeError("Plugin [ %s ] does not exist!" % pluginName)
 
-        self.pluginList.append(pluginCls(kwargs))
+        self.pluginList.append(pluginCls(**kwargs))
 
     def beforeRun(self):
         for i in range(len(self.pluginList)):
@@ -57,5 +60,3 @@ class PluginManager(object):
     def afterRun(self):
         for i in range(len(self.pluginList) - 1, -1, -1):
             self.pluginList[i].afterRun()
-
-

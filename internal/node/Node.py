@@ -41,6 +41,7 @@ class Node(AnubisRoot):
         self.action = list(map(self.bindActionParam, nodeInfo['action']))
         self.finishedAction = 0
         for parentId in self.parent:
+            self.root.graph.addEdge(parentId, self.id)
             parentNode = NodePool().getNode(parentId)
             if parentNode:
                 parentNode.sonNodes[self.id] = self
@@ -68,7 +69,7 @@ class Node(AnubisRoot):
             self.dealWithSonNode()
             return
         try:
-            self.runAction()
+            self.run()
         except Exception as e:
             raise e
         finally:
@@ -76,7 +77,7 @@ class Node(AnubisRoot):
 
     def registPlugin(self):
         self.pluginManager = PluginManager()
-        for pName,kwargs in self.plugins:
+        for pName, kwargs in self.plugins:
             self.pluginManager.registPlugin(pName, kwargs)
 
     def bindActionParam(self, action):

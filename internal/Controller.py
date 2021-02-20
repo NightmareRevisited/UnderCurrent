@@ -11,6 +11,7 @@ from .Anubis import Anubis
 from internal.exception.AnubisError import AnubisError
 import internal.consts as Const
 import sys
+import os
 
 from pkg.log.Log import Log
 
@@ -34,6 +35,7 @@ class AnubisController(AnubisRoot):
 """
 
     def __init__(self):
+        self.Key = None
         self.registParam()
         self.registLogger()
 
@@ -62,6 +64,9 @@ class AnubisController(AnubisRoot):
                 ## 指定任务名
                 self.TaskName = sys.argv[i + 1]
                 i += 1
+            elif argv[1:] == "k":
+                self.Key = sys.argv[i + 1]
+                i += 1
             elif argv[1:] == "p":
                 ## 设置工作流参数
                 self.TaskParam = {i[0]: i[1] for i in map(lambda x: x.split('='), sys.argv[i + 1:]) if i[1]}
@@ -76,6 +81,8 @@ class AnubisController(AnubisRoot):
             i += 1
 
     def registLogger(self):
+        if os.path.abspath(self.LOG_PATH) == os.path.abspath(self.ERROR_LOG_PATH):
+            raise AnubisError("Log文件不能与ErrorLog文件相同，会引发输出紊乱！")
         Log().registLog(open(self.LOG_PATH, 'a'))
         Log().registErrorLog(open(self.ERROR_LOG_PATH, 'a'))
 

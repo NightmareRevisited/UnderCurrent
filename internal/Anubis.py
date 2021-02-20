@@ -15,6 +15,7 @@ from internal.exception.ErrorStack import ErrorStack
 from pkg.log.Log import Log
 from pkg.thread.ThreadPool import ThreadPool
 from pkg.plugin.PluginManager import PluginManager
+from internal.graph.Graph import Graph
 import time
 
 
@@ -32,9 +33,11 @@ class Anubis(AnubisRoot):
         self.finishedNode = 0
         self.startTime = time.ctime()
         self.startTimeStamp = time.time()
-        self.load_config()
         self.errornode = []
         self.threadPool = ThreadPool(controller.ThreadNum)
+        self.graph = Graph()
+        self.load_config()
+        self.checkSomething()
 
     def load_config(self):
         if self.controller.ConfFile:
@@ -43,8 +46,7 @@ class Anubis(AnubisRoot):
                 self.taskName = config['name']
         else:
             self.taskName = self.controller.TaskName
-            PARAM_KEY = getKey(self.taskName)
-            KEY = self.params[PARAM_KEY]
+            KEY = self.controller.Key
             config = loadConfig(self.taskName, KEY)
         self.registParam(config['params'])
         self.name = config['name']
@@ -58,9 +60,8 @@ class Anubis(AnubisRoot):
 
     def registPlugin(self):
         self.pluginManager = PluginManager()
-        for pName,kwargs in self.plugins:
+        for pName, kwargs in self.plugins:
             self.pluginManager.registPlugin(pName, kwargs)
-
 
     def registParam(self, paramDefine):
         '''
@@ -90,7 +91,7 @@ class Anubis(AnubisRoot):
         else:
             raise AnubisError("Invalid Param Type: " + type)
 
-    def runNode(self,node):
+    def runNode(self, node):
         try:
             node.runNode()
         except Exception as e:
@@ -99,13 +100,12 @@ class Anubis(AnubisRoot):
             ErrorStack().add(e)
         self.semaphore.release()
 
-    def prepareNode(self,node):
+    def prepareNode(self, node):
         if not node.preposition.acquire(False):
             self.submitNode(node)
 
-    def submitNode(self,node):
+    def submitNode(self, node):
         self.threadPool.submit(self.runNode, (node,))
-
 
     def run(self):
         try:
@@ -142,3 +142,8 @@ ErrorNode: %s
         except:
             return 1
         return self.exitCode
+
+    def checkSomething(self):
+        hasCircle, circlePoint = self.graph.hasCircle()
+        if hasCircle:
+            raise AnubisError("节点关系中有环存在，请检查配置文件 [ %s ] !" % ','.join(circlePoint))

@@ -32,6 +32,10 @@ class Log(Singleton):
         logData = map(lambda x: str(x), logData)
         self._logQueue.put("\t".join(logData))
 
+    def debug(self,*logData):
+        logData = map(lambda x: str(x), logData)
+        self._stdoutQueue.put("\t".join(logData))
+
     def error(self, *erroLog):
         erroLog = map(lambda x: str(x), erroLog)
         self._errorQueue.put("\t".join(erroLog))

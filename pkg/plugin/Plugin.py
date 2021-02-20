@@ -9,6 +9,7 @@
 from __future__ import print_function
 import time
 from PluginBase import PluginBase
+from pkg.log.Log import Log
 
 try:
     from inspect import signature
@@ -51,6 +52,9 @@ except:
 #         print("This is a test plugin!")
 #         func()
 #         print("Test finished~")
+
+def print(*args):
+    Log().log(*args)
 
 
 class TimePlugin(PluginBase):

@@ -2,7 +2,10 @@
   "name": "test",
   "desc": "testtest",
   "plugins": [
-    ["TimePlugin",{}]
+    ["Test",{
+      "test1": 1,
+      "test2": 2
+    }]
   ],
   "params": {
     "test": {
@@ -14,10 +17,11 @@
       "desc":"节点1",
       "id":"node1",
       "parent":[
-        "node4"
+
       ],
       "plugins": [],
       "action": [
+        "echo 1"
       ]
     },
     {
@@ -27,9 +31,7 @@
         "node4"
       ],
       "plugins": [],
-      "action": {
-
-      }
+      "action": []
     },
     {
       "desc":"节点3",
@@ -40,18 +42,15 @@
         "node4"
       ],
       "plugins": [],
-      "action": {
-
-      }
+      "action": []
     },
     {
       "desc":"节点4",
       "id":"node4",
       "parent":[
+        "node1"
       ],
-      "action": {
-
-      }
+      "action": []
     }
   ]
 }

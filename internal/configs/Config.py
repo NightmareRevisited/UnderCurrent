@@ -38,6 +38,8 @@ def getKey(taskName):
 
 def loadConfig(taskName, configName=DEFAULT_NAME):
     # type: (str, str) -> dict
+    if configName == None:
+        configName = DEFAULT_NAME
     cPath = getConfigPath()
     cFile = os.path.join(cPath, taskName, "%s.json" % configName)
     defaultFile = os.path.join(cPath, taskName, "%s.json" % DEFAULT_NAME)
