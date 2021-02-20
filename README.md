@@ -255,7 +255,12 @@ anubis以json格式进行配置
   ```
   {
   ...
-  plugins
+  plugins：[
+  	"Test",{
+  		"test1":1,
+  		"test2",2
+  	}
+  ]
   ...
   }
   ```
