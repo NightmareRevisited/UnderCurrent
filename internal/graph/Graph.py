@@ -36,6 +36,8 @@ class Graph(AnubisRoot):
         检查有向图中是否有环
         :return:
         '''
+
+        ## 拓扑排序
         while True:
             isBreak = True
             for point in self.inDegree.keys():
